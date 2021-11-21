@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragmentos :: imports-css(title='Vendas')}">
+        <title>title</title>
+    </head>
+    <body>
+        <div th:replace="~{fragmentos :: barramenu(pagina='vendas')}"/>
+        <div class="container" style="margin-top: 20px">
+            <div class="card-header" style="border-radius: 10px ">
+                <h4>Vendas Realizadas
+                    <a class="btn btn-primary float-right" th:href="@{~/vendas/venda}" role="button">Nova Venda</a>
+                </h4>
+            </div><br>
+
+
+            <div class="body card" th:each="venda: ${vendas}" style="border-radius: 10px ; margin-bottom: 4px">
+                <div class="card-body">
+
+                    <div class="card-text">
+                        <span>ID:</span>
+                        <span th:text="${venda.id}"></span>
+                    </div>
+                    <div class="card-text">
+                        <span>Cliente:</span>
+                        <span th:text="${venda.cliente.nome}"></span>
+                    </div>
+                    <div class="card-text">
+                        <span>Funcionario:</span>
+                        <span th:text="${venda.funcionario.nome}"></span>
+                    </div>
+                    <div class="card-text">
+                        <span>Data:</span>
+                        <span th:text="${venda.datahora.get(5)+'/'+(venda.datahora.get(2)+1)+'/'+venda.datahora.get(1)}"></span>
+                       
+                    </div><br>
+                        
+                     <a th:href="@{'~/vendas/venda/'+${venda.id}}" class="btn btn-warning">Editar</a>
+                    <a th:href="@{'~/vendas/'+${venda.id}+'/deletar'}" class="btn btn-danger" onclick="return confirm('Deseja realmente Cancelar essa venda?')">Cancelar venda</a>
+                
+                </div>
+            </div>
+
+        </div>
+
+        <div th:replace="~{fragmentos :: imports-js}"/>
+    </body>
+</html>
