@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragmentos :: imports-css(title='Produtos')}">
+        <title>title</title>
+    </head>
+    <body>
+        <div th:replace="~{fragmentos :: barramenu(pagina='produtos')}"/>
+
+        <div class="container-fluid" style="width: 80%; margin-top: 20px">
+            <div class="card-header" style="border-radius: 10px ">
+                <h4>Cadastro de Produtos
+                    <a class="btn btn-primary float-right" th:href="@{~/produtos}" role="button">voltar</a>
+                </h4>
+            </div><br></br>
+
+
+            <div id="main" class="container-fluid bg-dark text-white" style="margin-top: 20px; margin-bottom: 20px; width: 85%; border-radius: 10px">
+               
+
+                <div th:replace="~{fragmentos :: mensagens}"></div>
+                <form th:object="${produto}" th:action="@{~/produtos/produto/{id}(id=${produto.id})}" method="post" class="card-body">
+                    <input type="hidden" th:field="*{id}"/>
+                    <div class="row">
+                        <div class="form-group col-md-8">
+                            <label for="campo1">Descrição</label>
+                            <input th:field="*{descricao}" type="text" class="form-control"  id="campo1" placeholder="Descricao" required="required" maxlength="80"/>
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <label for="campo2">Valor</label>
+                            <input th:field="*{valor}" type="text" class="form-control"  id="campo2" placeholder="Valor" required="required" />
+
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <label for="campo3">Quantidade</label>
+                            <input th:field="*{qtde_estoque}" type="text" class="form-control"  id="campo3" placeholder="Quantidade" required="required" />    
+                        </div>
+                    </div>
+                    <!-- area de campos do form -->
+                    <hr />
+                    <div id="actions" class="row">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+           
+
+        </div>
+
+        <div th:replace="~{fragmentos :: imports-js}"/>
+        <script>
+
+        </script>
+    </body>
+    <</html>

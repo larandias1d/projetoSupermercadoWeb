@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+        <head th:replace="~{fragmentos :: imports-css(title='Vendas')}">
+            <title>title</title>
+        </head>
+        <body>
+            <div th:replace="~{fragmentos :: barramenu(pagina='vendas')}"/>
+
+            <div class="container-fluid" style="width: 80%; margin-top: 20px">
+                <div class="card-header" style="border-radius: 10px ">
+                    <h4>Carrinho de Compras
+                     <a class="btn btn-primary float-right" th:href="@{~/vendas}" role="button">voltar</a>
+                    </h4>
+                </div>
+
+                <div id="main" class="container-fluid" style="margin-top: 20px; margin-bottom: 20px; width: 85%">
+               
+
+                    <div th:replace="~{fragmentos :: mensagens}"></div>
+
+
+
+                    <form th:object="${venda}"  th:action="@{~/vendas/venda/{id}(id=${venda.id})}" method="post" class="card-body">
+                        <input type="hidden" th:field="*{id}"/>
+
+                        <div class="form-row">
+                            <input type="hidden" class="form-control" id="id" name="id" th:field="*{id}" readonly />
+
+
+                            <input type="hidden" class="form-control" th:field="*{datahora}" name="datahora" readonly />
+
+
+                        </div>    
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Cliente:</label>
+                                <select class="form-control" th:field="*{cliente.id}">
+                                    <option th:each="cliente : ${clientes}" th:text="${cliente.nome}" th:value="${cliente.id}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Funcionário:</label>
+                                <select class="form-control" th:field="*{funcionario.id}">
+                                    <option th:each="funcionario : ${funcionarios}" th:text="${funcionario.nome}" th:value="${funcionario.id}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="form-row" >
+                            <h4>Itens do venda </h4>
+                        </div>
+                        <br />
+
+                        <div class="form-row">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Produto</th>
+                                        <th scope="col">Quantidade</th>              
+                                        <th scope="col">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    <tr th:each="item, i : ${venda.item_vendas}">
+                                        <td width="400px">
+                                            <select th:field="*{item_vendas[__${i.index}__].produto.id}" class="form-control" required>
+                                                <option th:each="produto : ${produtos}"
+                                                        th:value="${produto.id}"
+                                                        th:text="${produto.descricao}"></option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" class="col-xs-2 form-control" th:field="*{item_vendas[__${i.index}__].qtde}" min="1"></td>
+                                        
+                                        <td><button type="button" th:id="${ 'remover'+i.index} " class="btn btn-dark btn-sm removerLinha" style="text-align: left">Remover</button></td>
+                                    </tr>         
+                                    
+                                    <tr th:if="${venda.item_vendas.size()<=0}">
+                                        <td width="400px">
+                                            <select th:field="*{item_vendas[0].produto.id}" class="form-control" required>
+                                                <option th:each="produto : ${produtos}"
+                                                        th:value="${produto.id}"
+                                                        th:text="${produto.descricao}"></option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" class="col-xs-2 form-control" th:field="*{item_vendas[0].qtde}" required></td>
+                                        
+                                        <td><button type="button" id="remover0" class="btn btn-dark btn-sm removerLinha" style="text-align: left">Remover</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" onclick="location.href = '/vendas';" id="cancelar" class="btn btn-dark btn-sm" style="text-align: left">Cancelar</button>&nbsp;&nbsp;
+                        <button type="submit" class="btn btn-dark btn-sm" style="text-align: right">Salvar</button>&nbsp;&nbsp;
+                        <button type="button" id="adicionar" class="btn btn-dark btn-sm" style="text-align: left">Adicionar</button>
+
+                    </form>
+
+                </div>
+
+                <script>
+                    var tabela = document.body.querySelector("table tbody");
+                    adicionar.addEventListener("click", function (event) {
+                        var cont = document.body.querySelectorAll("tbody tr").length;
+                        var clone = document.body.querySelectorAll("table tr")[1].cloneNode(true);
+                        var els = clone.querySelectorAll("input,select,button");
+                        for (var x = 0; x < els.length; x++) {
+                            els[x].value = '';
+                            if (els[x].name.includes('produto')){
+                                els[x].name = 'item_vendas[' + cont + '].produto.id';
+                                els[x].id = 'item_vendas' + cont + '.produto.id';
+                            }
+                             if (els[x].name.includes('qtde')){
+                                els[x].name = 'item_vendas[' + cont + '].qtde';
+                                els[x].id = 'item_vendas' + cont + '.qtde';
+                            }
+                             if (els[x].name.includes('remover')){
+                                els[x].id = 'remover' + cont ;
+                            }
+                        }
+                        tabela.appendChild(clone);
+                    });
+
+                    tabela.addEventListener('click', function (event) {
+                        if (!event.target.classList.contains('removerLinha')) {
+                            return;
+                        }
+
+                        var rows = document.body.querySelectorAll("tbody tr");
+                        if (rows && rows.length > 1) {
+                            event.target.parentNode.parentNode.remove();
+                            event.preventDefault();
+                        } else {
+                            alert("O venda deve possuir pelo menos 1 item!");
+                        }
+                    });
+                    function atualizar() {
+                        var rows = document.body.querySelectorAll("tbody tr");
+                        for (var x = 0; x < rows.length; x++) {
+                            var els = rows[x].querySelectorAll("input,select,button");
+                            for (var y = 0; y <els.length; y++) {
+                                if (els[y].name.includes('produto')){
+                                    els[y].name = 'item_vendas[' + x + '].produto.id';
+                                    els[y].id = 'item_vendas' + x + '.produto.id';
+                                }
+                                if (els[y].name.includes('qtde')){
+                                    els[y].name = 'item_vendas[' + x + '].qtde';
+                                    els[y].id = 'item_vendas' + x + '.qtde';
+                                }
+                                 if (els[y].name.includes('remover')){
+                                    els[y].id = 'remover' + x;
+                                }
+                               
+                            }
+                        }
+                    }
+                </script>
+
+                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+        </body>
+    </html>
